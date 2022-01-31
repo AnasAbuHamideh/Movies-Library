@@ -22,12 +22,9 @@ function helloworldhandler(req,res){
     return res.status(200).send("Hello world");
 }
 function homepagehandler(req,res){
- let movies=[];
- movieData.data.map(movie =>{
-  let onemovie = new Movie(movie.title,movie.poster_path,movie.overview)
-  movies.push(onemovie)
- })
-  return res.status(200).json(movies)
+  let onemovie = new Movie(movieData.title,movieData.poster_path,movieData.overview)
+  //movies.push(onemovie)
+  return res.status(200).json(onemovie)
 }
 function favoritepagehandler(){
     return res.status(200).send("Welcome to Favorite Page");
