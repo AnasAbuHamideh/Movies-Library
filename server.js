@@ -6,9 +6,10 @@ const cors = require('cors');
 const axios=require('axios');
 const movieData = require('./data.json');
 const app = express();
-
+const pg=require('pg');
+const client=new pg.Client(process.env.DATABASE_URL);
 app.use(cors());
-
+app.use(express.json())
 const PORT = process.env.PORT;
 
 app.get('/',helloworldhandler);
@@ -16,6 +17,10 @@ app.get('/Home',homepagehandler);
 app.get('/favorite',favoritepagehandler);
 app.get('/trending',terindinghandler);
 app.get('/search',searhmoviehandler);
+
+app.post('/addMovie',addmoviehandler);
+app.get('/getMovies',getmoviehandler);
+
 app.use('*',servererror);
 app.use('!',notFoundHndler);
 
@@ -50,7 +55,7 @@ let Surl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.APIS
     });
     return res.status(200).json(movies);
  }).catch((err)=>{
-   
+    servererror(err,req,res);
  })
 } 
 function terindinghandler(req,res){
@@ -61,15 +66,44 @@ axios.get(turl).then((data)=>{
     });
     return res.status(200).json(movies);
  }).catch((err)=>{
-     
+     servererror(err,req,res);
  })
-} 
+}
+
+function addmoviehandler(req,res){
+const movie =req.body;
+let sql = `INSERT INTO addMovie(title,release_date,poster_path,overview) VALUES ($1,$2,$3,$4) RETURNING *;`
+  let values=[movie.title,movie.release_date,movie.poster_path,movie.overview];
+  client.query(sql,values).then(data =>{
+      res.status(200).json(data.rows);
+  }).catch(error=>{
+      errorHandler(error,req,res)
+  });
+}
+
+function getmoviehandler(req,res){
+    let sql = `SELECT * FROM addMovie;`;
+    client.query(sql).then(data=>{
+       res.status(200).json(data.rows);
+    }).catch(error=>{
+        errorHandler(error,req,res)
+    });
+
+}
+
 function servererror(req,res){
-    return res.status(500).send('Sorry, something went wrong')
+    const err={
+        status:500,
+        message:'Sorry, something went wrong'
+    }
+    return res.status(500).send(err);
 }
 function notFoundHndler(req,res){
     return res.status(404).send('page not found error')
 }
-app.listen(3000, ()=>{
-    console.log("listening to port 3000");
+
+client.connect().then(()=>{
+    app.listen(PORT,()=>{
+        console.log(`listining to port ${PORT}`)
+    })
 })
