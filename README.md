@@ -14,5 +14,6 @@ Should creat (.env) file and add this:
 PORT=3000
 APITKEY=37ddc7081e348bf246a42f3be2b3dfd0
 APISKEY=668baa4bb128a32b82fe0c15b21dd699
+DATABASE_URL=postgress://anas:123456@localhost:5432/demo
 ## Project Features
 <!-- What are the features included in you app -->

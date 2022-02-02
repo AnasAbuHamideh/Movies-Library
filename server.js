@@ -21,7 +21,11 @@ app.get('/search',searhmoviehandler);
 app.post('/addMovie',addmoviehandler);
 app.get('/getMovies',getmoviehandler);
 
-app.use('*',servererror);
+app.put('/UPDATE/:id',updatemoviehandler);
+app.delete('/DELETE/:id',deletemoviehandler);
+app.get('/getMovie/:id',gethandler);
+
+app.use('*',errorHandler);
 app.use('!',notFoundHndler);
 
 
@@ -55,7 +59,7 @@ let Surl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.APIS
     });
     return res.status(200).json(movies);
  }).catch((err)=>{
-    servererror(err,req,res);
+    errorHandler(err,req,res);
  })
 } 
 function terindinghandler(req,res){
@@ -66,7 +70,7 @@ axios.get(turl).then((data)=>{
     });
     return res.status(200).json(movies);
  }).catch((err)=>{
-     servererror(err,req,res);
+    errorHandler(err,req,res);
  })
 }
 
@@ -91,13 +95,47 @@ function getmoviehandler(req,res){
 
 }
 
-function servererror(req,res){
+function updatemoviehandler(req,res){
+    const id = req.params.id;
+    console.log(req.params.name);
+    const movie = req.body;
+    const sql = `UPDATE addMovie SET title =$1, release_date = $2, poster_path = $3 ,overview=$4 WHERE id=$5 RETURNING *;`; 
+    let values=[movie.title,movie.release_date,movie.poster_path,movie.overview,id];
+    client.query(sql,values).then(data=>{
+        res.status(200).json(data.rows);
+    }).catch(error=>{
+        errorHandler(error,req,res)
+    });
+}
+function deletemoviehandler(req,res){
+        const id = req.params.id;
+        const sql = `DELETE FROM addMovie WHERE id=${id};` 
+    
+        client.query(sql).then(()=>{
+            res.status(200).send("The Movie has been deleted");
+        }).catch(error=>{
+            errorHandler(error,req,res)
+        });
+    }
+
+function gethandler(req,res){
+
+        let sql = `SELECT * FROM addMovie WHERE id=${req.params.id};`;
+    
+        client.query(sql).then(data=>{
+           res.status(200).json(data.rows);
+        }).catch(error=>{
+            errorHandler(error,req,res)
+        });
+    }
+function errorHandler(req,res){
     const err={
         status:500,
         message:'Sorry, something went wrong'
     }
     return res.status(500).send(err);
 }
+
 function notFoundHndler(req,res){
     return res.status(404).send('page not found error')
 }
