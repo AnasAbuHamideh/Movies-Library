@@ -140,8 +140,12 @@ function notFoundHndler(req,res){
     return res.status(404).send('page not found error')
 }
 
-client.connect().then(()=>{
-    app.listen(PORT,()=>{
-        console.log(`listining to port ${PORT}`)
-    })
+// client.connect().then(()=>{
+//     app.listen(PORT,()=>{
+//         console.log(`listining to port ${PORT}`)
+//     })
+// })
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 })
