@@ -7,7 +7,10 @@ const axios=require('axios');
 const movieData = require('./data.json');
 const app = express();
 const pg=require('pg');
-const client=new pg.Client(process.env.DATABASE_URL);
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+})
 app.use(cors());
 app.use(express.json())
 const PORT = process.env.PORT;
@@ -140,12 +143,9 @@ function notFoundHndler(req,res){
     return res.status(404).send('page not found error')
 }
 
-// client.connect().then(()=>{
-//     app.listen(PORT,()=>{
-//         console.log(`listining to port ${PORT}`)
-//     })
-// })
-const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+client.connect().then(()=>{
+    app.listen(PORT,()=>{
+        console.log(`listining to port ${PORT}`)
+    })
 })
+
