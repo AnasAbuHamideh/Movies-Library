@@ -5,12 +5,13 @@
 
 ## WRRC
 Add an image of your WRRC here
+![WRRC](./Untitled.jpg)
 
 ## Overview
 
 ## Getting Started
 <!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
-Should creat (.env) file and add this:
+Should create (.env) file and add this:
 PORT=3000
 APITKEY=37ddc7081e348bf246a42f3be2b3dfd0
 APISKEY=668baa4bb128a32b82fe0c15b21dd699
